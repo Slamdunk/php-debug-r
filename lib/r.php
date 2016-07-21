@@ -13,8 +13,8 @@ namespace
     function rq($query, $params, $exit = true, $level = 0, $fullstack = false)
     {
         uksort($params, function ($key1, $key2) {
-            $len1 = mb_strlen($key1);
-            $len2 = mb_strlen($key2);
+            $len1 = strlen($key1);
+            $len2 = strlen($key2);
 
             if ($len1 === $len2) {
                 return 0;

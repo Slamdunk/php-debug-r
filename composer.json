@@ -14,6 +14,7 @@
         "files": ["lib/r.php"]
     },
     "require-dev": {
-        "doctrine/common": "^2.6"
+        "doctrine/common": "^2.6",
+        "phpunit/phpunit": "^5.4"
     }
 }
