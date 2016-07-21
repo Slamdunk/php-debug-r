@@ -1,0 +1,19 @@
+{
+    "name": "slam/php-debug-r",
+    "type": "library",
+    "description": "Debug function",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Filippo Tessarotto",
+            "email": "zoeslam@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "files": ["lib/r.php"]
+    },
+    "require-dev": {
+        "doctrine/common": "^2.6"
+    }
+}
