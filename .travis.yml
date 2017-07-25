@@ -2,16 +2,23 @@ language: php
 
 sudo: false
 
-cache:
-  directory:
-      - $HOME/.composer/cache
+env:
+    global:
+        - PHP_LATEST_VERSION=0
 
-php:
-  - 5.6
-  - 7.0
+matrix:
+    fast_finish: true
+    include:
+        - php: 7.0
+        - php: 7.1
+          env: PHP_LATEST_VERSION=1
+
+cache:
+  directories:
+    - $HOME/.composer
 
 install:
-  - composer self-update
+  - phpenv config-rm xdebug.ini
   - composer install --prefer-dist
 
 script:
