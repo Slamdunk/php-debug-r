@@ -1,26 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace
 {
     use Slam\Debug\R as DebugR;
 
-    function r($var, $exit = true, $level = 0, $fullstack = false)
+    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false)
     {
         DebugR::$db = debug_backtrace();
         DebugR::debug($var, $exit, $level, $fullstack);
     }
 
-    function rq($query, $params, $exit = true, $level = 0, $fullstack = false)
+    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false)
     {
-        uksort($params, function ($key1, $key2) {
-            $len1 = strlen($key1);
-            $len2 = strlen($key2);
-
-            if ($len1 === $len2) {
-                return 0;
-            }
-
-            return ($len1 > $len2) ? -1 : 1;
+        uksort($params, function (string $key1, string $key2) {
+            return strlen($key2) <=> strlen($key1);
         });
 
         foreach ($params as $key => $value) {
@@ -48,7 +43,7 @@ namespace Slam\Debug
         {
         }
 
-        public static function debug($var, $exit = true, $level = 0, $fullstack = false)
+        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false)
         {
             if ($var === null or is_scalar($var)) {
                 ob_start();
@@ -71,7 +66,7 @@ namespace Slam\Debug
             }
         }
 
-        private static function formatDb($fullstack)
+        private static function formatDb(bool $fullstack): string
         {
             $output = '';
 

@@ -13,8 +13,11 @@
     "autoload": {
         "files": ["lib/r.php"]
     },
+    "require": {
+        "php": "^7.0"
+    },
     "require-dev": {
-        "doctrine/common": "^2.6",
-        "phpunit/phpunit": "^5.4"
+        "doctrine/common": "^2.7",
+        "phpunit/phpunit": "^6.2"
     }
 }

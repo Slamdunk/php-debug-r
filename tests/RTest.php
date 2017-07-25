@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SlamTest\Debug;
 
+use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class RTest extends \PHPUnit_Framework_TestCase
+final class RTest extends TestCase
 {
     public function testScalar()
     {
@@ -34,7 +37,7 @@ class RTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains(__FILE__, $output);
         $this->assertContains(__FUNCTION__, $output);
-        $this->assertContains('PHPUnit_Framework_TestCase', $output);
+        $this->assertContains('TestCase', $output);
     }
 
     public function testQueryDebug()
@@ -49,7 +52,7 @@ class RTest extends \PHPUnit_Framework_TestCase
     public function testDoctrine()
     {
         ob_start();
-        r(new stdClass, false, 1);
+        r(new stdClass(), false, 1);
         $output = ob_get_clean();
 
         $this->assertContains(__FILE__, $output);
