@@ -2,16 +2,15 @@ language: php
 
 sudo: false
 
-env:
-    global:
-        - PHP_LATEST_VERSION=0
-
 matrix:
-    fast_finish: true
-    include:
-        - php: 7.0
-        - php: 7.1
-          env: PHP_LATEST_VERSION=1
+  fast_finish: true
+  include:
+    - php: 7.0
+    - php: 7.1
+    - php: 7.2
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
+    - php: nightly
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
 
 cache:
   directories:
@@ -19,7 +18,7 @@ cache:
 
 install:
   - phpenv config-rm xdebug.ini
-  - composer install --prefer-dist
+  - composer install --prefer-dist $COMPOSER_FLAGS
 
 script:
   - php --no-php-ini ./vendor/bin/phpunit
