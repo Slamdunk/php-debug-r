@@ -19,7 +19,7 @@ install:
   - composer install --prefer-dist
 
 script:
-  - php --no-php-ini ./vendor/bin/phpunit
+  - vendor/bin/phpunit
 
 notifications:
   email: false
