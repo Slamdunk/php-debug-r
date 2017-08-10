@@ -8,17 +8,15 @@ matrix:
     - php: 7.0
     - php: 7.1
     - php: 7.2
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: nightly
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
 
 cache:
   directories:
     - $HOME/.composer
 
 install:
-  - phpenv config-rm xdebug.ini
-  - composer install --prefer-dist $COMPOSER_FLAGS
+  - phpenv config-rm xdebug.ini || return 0
+  - composer install --prefer-dist
 
 script:
   - php --no-php-ini ./vendor/bin/phpunit
