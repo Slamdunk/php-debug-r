@@ -11,9 +11,9 @@ final class RTest extends TestCase
 {
     public function testScalar()
     {
-        ob_start();
+        \ob_start();
         r(1, false);
-        $output = ob_get_clean();
+        $output = \ob_get_clean();
 
         $this->assertContains(__FILE__, $output);
         $this->assertContains('int(1)', $output);
@@ -21,9 +21,9 @@ final class RTest extends TestCase
 
     public function testNonScalar()
     {
-        ob_start();
+        \ob_start();
         r(array(1 => 2), false);
-        $output = ob_get_clean();
+        $output = \ob_get_clean();
 
         $this->assertContains(__FILE__, $output);
         $this->assertContains("Array\n(\n    [1] => 2\n)", $output);
@@ -31,9 +31,9 @@ final class RTest extends TestCase
 
     public function testFullstackOutput()
     {
-        ob_start();
+        \ob_start();
         r(1, false, 0, true);
-        $output = ob_get_clean();
+        $output = \ob_get_clean();
 
         $this->assertContains(__FILE__, $output);
         $this->assertContains(__FUNCTION__, $output);
@@ -42,18 +42,18 @@ final class RTest extends TestCase
 
     public function testQueryDebug()
     {
-        ob_start();
+        \ob_start();
         rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', array('p1' => 1, 'p11' => 2, 'p2' => '"'), false, 0, true);
-        $output = ob_get_clean();
+        $output = \ob_get_clean();
 
         $this->assertContains('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', $output);
     }
 
     public function testDoctrine()
     {
-        ob_start();
+        \ob_start();
         r(new stdClass(), false, 1);
-        $output = ob_get_clean();
+        $output = \ob_get_clean();
 
         $this->assertContains(__FILE__, $output);
         $this->assertContains('__CLASS__', $output);
@@ -61,13 +61,13 @@ final class RTest extends TestCase
 
     public function testClearRootPath()
     {
-        define('ROOT_PATH', __DIR__);
+        \define('ROOT_PATH', __DIR__);
 
-        ob_start();
+        \ob_start();
         r(1, false);
-        $output = ob_get_clean();
+        $output = \ob_get_clean();
 
-        $this->assertContains(basename(__FILE__), $output);
+        $this->assertContains(\basename(__FILE__), $output);
         $this->assertNotContains(__DIR__, $output);
     }
 }

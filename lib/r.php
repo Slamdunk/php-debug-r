@@ -8,25 +8,25 @@ namespace
 
     function r($var, bool $exit = true, int $level = 0, bool $fullstack = false)
     {
-        DebugR::$db = debug_backtrace();
+        DebugR::$db = \debug_backtrace();
         DebugR::debug($var, $exit, $level, $fullstack);
     }
 
     function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false)
     {
-        uksort($params, function (string $key1, string $key2) {
-            return strlen($key2) <=> strlen($key1);
+        \uksort($params, function (string $key1, string $key2) {
+            return \strlen($key2) <=> \strlen($key1);
         });
 
         foreach ($params as $key => $value) {
-            $query = str_replace(
-                sprintf(':%s', $key),
-                sprintf('"%s"', str_replace('"', '\\"', $value)),
+            $query = \str_replace(
+                \sprintf(':%s', $key),
+                \sprintf('"%s"', \str_replace('"', '\\"', $value)),
                 $query
             );
         }
 
-        DebugR::$db = debug_backtrace();
+        DebugR::$db = \debug_backtrace();
         DebugR::debug($query, $exit, $level, $fullstack);
     }
 }
@@ -45,20 +45,20 @@ namespace Slam\Debug
 
         public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false)
         {
-            if ($var === null or is_scalar($var)) {
-                ob_start();
-                var_dump($var);
-                $output = trim(ob_get_clean());
-            } elseif ($level > 0 and class_exists(DoctrineDebug::class)) {
-                $output = print_r(DoctrineDebug::export($var, $level), true);
+            if (null === $var or \is_scalar($var)) {
+                \ob_start();
+                \var_dump($var);
+                $output = \trim(\ob_get_clean());
+            } elseif ($level > 0 and \class_exists(DoctrineDebug::class)) {
+                $output = \print_r(DoctrineDebug::export($var, $level), true);
             } else {
-                $output = print_r($var, true);
+                $output = \print_r($var, true);
             }
 
-            if (PHP_SAPI === 'cli') {
-                echo PHP_EOL . self::formatDb($fullstack) . $output . PHP_EOL;
+            if (\PHP_SAPI === 'cli') {
+                echo \PHP_EOL . self::formatDb($fullstack) . $output . \PHP_EOL;
             } else {
-                echo '<pre><strong>' . self::formatDb($fullstack) . '</strong><br />' . htmlspecialchars($output) . '</pre>';
+                echo '<pre><strong>' . self::formatDb($fullstack) . '</strong><br />' . \htmlspecialchars($output) . '</pre>';
             }
 
             if ($exit) {
@@ -79,21 +79,21 @@ namespace Slam\Debug
 
                 $args = array();
                 foreach ($point['args'] as $argument) {
-                    $args[] = (is_object($argument)
-                        ? get_class($argument)
-                        : gettype($argument)
+                    $args[] = (\is_object($argument)
+                        ? \get_class($argument)
+                        : \gettype($argument)
                     );
                 }
 
-                $output .= '(' . implode(', ', $args) . ')' . PHP_EOL;
+                $output .= '(' . \implode(', ', $args) . ')' . \PHP_EOL;
 
                 if (! $fullstack) {
                     break;
                 }
             }
 
-            if (defined('ROOT_PATH')) {
-                return str_replace(ROOT_PATH, '.', $output);
+            if (\defined('ROOT_PATH')) {
+                return \str_replace(ROOT_PATH, '.', $output);
             }
 
             return $output;
