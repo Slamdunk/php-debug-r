@@ -18,7 +18,7 @@
     },
     "require-dev": {
         "doctrine/common": "^2.8",
-        "phpunit/phpunit": "^6.5",
+        "phpunit/phpunit": "^7.0",
         "roave/security-advisories": "dev-master"
     }
 }
