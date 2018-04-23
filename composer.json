@@ -13,6 +13,9 @@
     "autoload": {
         "files": ["lib/r.php"]
     },
+    "autoload-dev": {
+        "classmap": ["tests/"]
+    },
     "require": {
         "php": "^7.1"
     },

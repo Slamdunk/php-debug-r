@@ -6,13 +6,13 @@ namespace
 {
     use Slam\Debug\R as DebugR;
 
-    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false)
+    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
     {
         DebugR::$db = \debug_backtrace();
         DebugR::debug($var, $exit, $level, $fullstack);
     }
 
-    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false)
+    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false): void
     {
         \uksort($params, function (string $key1, string $key2) {
             return \strlen($key2) <=> \strlen($key1);
@@ -37,13 +37,13 @@ namespace Slam\Debug
 
     final class R
     {
-        public static $db = array();
+        public static $db = [];
 
         private function __construct()
         {
         }
 
-        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false)
+        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
         {
             if (null === $var or \is_scalar($var)) {
                 \ob_start();
@@ -56,7 +56,7 @@ namespace Slam\Debug
             }
 
             if (\PHP_SAPI === 'cli') {
-                echo \PHP_EOL . self::formatDb($fullstack) . $output . \PHP_EOL;
+                \fwrite(\STDERR, \PHP_EOL . self::formatDb($fullstack) . $output . \PHP_EOL);
             } else {
                 echo '<pre><strong>' . self::formatDb($fullstack) . '</strong><br />' . \htmlspecialchars($output) . '</pre>';
             }
@@ -77,7 +77,7 @@ namespace Slam\Debug
 
                 $output .= (isset($point['class']) ? $point['class'] . '->' : '') . $point['function'];
 
-                $args = array();
+                $args = [];
                 foreach ($point['args'] as $argument) {
                     $args[] = (\is_object($argument)
                         ? \get_class($argument)
