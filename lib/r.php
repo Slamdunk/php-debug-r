@@ -141,7 +141,7 @@ namespace Slam\Debug\Doctrine
         public static function dump($var, $maxDepth = 2, $stripTags = true, $echo = true)
         {
             if (\extension_loaded('xdebug')) {
-                \ini_set('xdebug.var_display_max_depth', $maxDepth);
+                \ini_set('xdebug.var_display_max_depth', (string) $maxDepth);
             }
 
             $var = self::export($var, $maxDepth);
