@@ -1,106 +1,7 @@
 <?php
-
-declare(strict_types=1);
-
-namespace
-{
-    use Slam\Debug\R as DebugR;
-
-    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
-    {
-        DebugR::$db = \debug_backtrace();
-        DebugR::debug($var, $exit, $level, $fullstack);
-    }
-
-    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false): void
-    {
-        \uksort($params, function (string $key1, string $key2) {
-            return \strlen($key2) <=> \strlen($key1);
-        });
-
-        foreach ($params as $key => $value) {
-            $query = \str_replace(
-                \sprintf(':%s', $key),
-                \sprintf('"%s"', \str_replace('"', '\\"', $value)),
-                $query
-            );
-        }
-
-        DebugR::$db = \debug_backtrace();
-        DebugR::debug($query, $exit, $level, $fullstack);
-    }
-}
-
-namespace Slam\Debug
-{
-    final class R
-    {
-        public static $db = [];
-
-        private function __construct()
-        {
-        }
-
-        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
-        {
-            if (null === $var or \is_scalar($var)) {
-                \ob_start();
-                \var_dump($var);
-                $output = \trim(\ob_get_clean());
-            } elseif ($level > 0) {
-                $output = \print_r(Doctrine\Debug::export($var, $level), true);
-            } else {
-                $output = \print_r($var, true);
-            }
-
-            if (\PHP_SAPI === 'cli') {
-                \fwrite(\STDERR, \PHP_EOL . self::formatDb($fullstack) . $output . \PHP_EOL);
-            } else {
-                echo '<pre><strong>' . self::formatDb($fullstack) . '</strong><br />' . \htmlspecialchars($output) . '</pre>';
-            }
-
-            if ($exit) {
-                exit(253);
-            }
-        }
-
-        private static function formatDb(bool $fullstack): string
-        {
-            $output = '';
-
-            foreach (self::$db as $point) {
-                if (isset($point['file'])) {
-                    $output .= $point['file'] . '(' . $point['line'] . '): ';
-                }
-
-                $output .= (isset($point['class']) ? $point['class'] . '->' : '') . $point['function'];
-
-                $args = [];
-                foreach ($point['args'] as $argument) {
-                    $args[] = (\is_object($argument)
-                        ? \get_class($argument)
-                        : \gettype($argument)
-                    );
-                }
-
-                $output .= '(' . \implode(', ', $args) . ')' . \PHP_EOL;
-
-                if (! $fullstack) {
-                    break;
-                }
-            }
-
-            if (\defined('ROOT_PATH')) {
-                return \str_replace(ROOT_PATH, '.', $output);
-            }
-
-            return $output;
-        }
-    }
-}
-
 namespace Slam\Debug\Doctrine
 {
+
     use Doctrine\Common\Collections\Collection;
     use Doctrine\Common\Persistence\Proxy;
 
@@ -139,6 +40,12 @@ namespace Slam\Debug\Doctrine
          */
         public static function dump($var, $maxDepth = 2, $stripTags = true, $echo = true)
         {
+            $html = ini_get('html_errors');
+
+            if ($html !== true) {
+                ini_set('html_errors', true);
+            }
+
             if (extension_loaded('xdebug')) {
                 ini_set('xdebug.var_display_max_depth', $maxDepth);
             }
@@ -153,6 +60,8 @@ namespace Slam\Debug\Doctrine
             ob_end_clean();
 
             $dumpText = ($stripTags ? strip_tags(html_entity_decode($dump)) : $dump);
+
+            ini_set('html_errors', $html);
 
             if ($echo) {
                 echo $dumpText;
@@ -204,7 +113,7 @@ namespace Slam\Debug\Doctrine
                 return $return;
             }
 
-            $return->__CLASS__ = self::getClass($var);
+            $return->__CLASS__ = ClassUtils::getClass($var);
 
             if ($var instanceof Proxy) {
                 $return->__IS_PROXY__          = true;
@@ -233,43 +142,28 @@ namespace Slam\Debug\Doctrine
             $clone = (array) $var;
 
             foreach (array_keys($clone) as $key) {
-                $aux  = explode("\0", (string) $key);
+                $aux  = explode("\0", $key);
                 $name = end($aux);
                 if ($aux[0] === '') {
                     $name .= ':' . ($aux[1] === '*' ? 'protected' : $aux[1] . ':private');
                 }
                 $return->$name = self::export($clone[$key], $maxDepth - 1);
+                ;
             }
 
             return $return;
         }
 
         /**
-         * Gets the real class name of a class name that could be a proxy.
+         * Returns a string representation of an object.
          *
-         * @param string $class
-         *
-         * @return string
-         */
-        private static function getRealClass($class)
-        {
-            if (! class_exists(Proxy::class) || false === ($pos = strrpos($class, '\\' . Proxy::MARKER . '\\'))) {
-                return $class;
-            }
-
-            return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
-        }
-
-        /**
-         * Gets the real class name of an object (even if its a proxy).
-         *
-         * @param object $object
+         * @param object $obj
          *
          * @return string
          */
-        private static function getClass($object)
+        public static function toString($obj)
         {
-            return self::getRealClass(get_class($object));
+            return method_exists($obj, '__toString') ? (string) $obj : get_class($obj) . '@' . spl_object_hash($obj);
         }
     }
 }
