@@ -1,21 +1,24 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Slam\Debug\Doctrine
 {
-
     use Doctrine\Common\Collections\Collection;
     use Doctrine\Common\Persistence\Proxy;
 
     /**
      * Static class containing most used debug methods.
      *
-     * @link   www.doctrine-project.org
+     * @see   www.doctrine-project.org
      * @since  2.0
+     *
      * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
      * @author Jonathan Wage <jonwage@gmail.com>
      * @author Roman Borschel <roman@code-factory.org>
      * @author Giorgio Sironi <piccoloprincipeazzurro@gmail.com>
      *
-     * @deprecated The Debug class is deprecated, please use symfony/var-dumper instead.
+     * @deprecated the Debug class is deprecated, please use symfony/var-dumper instead
      */
     final class Debug
     {
@@ -29,39 +32,39 @@ namespace Slam\Debug\Doctrine
         /**
          * Prints a dump of the public, protected and private properties of $var.
          *
-         * @link https://xdebug.org/
+         * @see https://xdebug.org/
          *
-         * @param mixed   $var       The variable to dump.
-         * @param integer $maxDepth  The maximum nesting level for object properties.
-         * @param boolean $stripTags Whether output should strip HTML tags.
-         * @param boolean $echo      Send the dumped value to the output buffer
+         * @param mixed $var       the variable to dump
+         * @param int   $maxDepth  the maximum nesting level for object properties
+         * @param bool  $stripTags whether output should strip HTML tags
+         * @param bool  $echo      Send the dumped value to the output buffer
          *
          * @return string
          */
         public static function dump($var, $maxDepth = 2, $stripTags = true, $echo = true)
         {
-            $html = ini_get('html_errors');
+            $html = \ini_get('html_errors');
 
-            if ($html !== true) {
-                ini_set('html_errors', true);
+            if (true !== $html) {
+                \ini_set('html_errors', true);
             }
 
-            if (extension_loaded('xdebug')) {
-                ini_set('xdebug.var_display_max_depth', $maxDepth);
+            if (\extension_loaded('xdebug')) {
+                \ini_set('xdebug.var_display_max_depth', $maxDepth);
             }
 
             $var = self::export($var, $maxDepth);
 
-            ob_start();
-            var_dump($var);
+            \ob_start();
+            \var_dump($var);
 
-            $dump = ob_get_contents();
+            $dump = \ob_get_contents();
 
-            ob_end_clean();
+            \ob_end_clean();
 
-            $dumpText = ($stripTags ? strip_tags(html_entity_decode($dump)) : $dump);
+            $dumpText = ($stripTags ? \strip_tags(\html_entity_decode($dump)) : $dump);
 
-            ini_set('html_errors', $html);
+            \ini_set('html_errors', $html);
 
             if ($echo) {
                 echo $dumpText;
@@ -79,18 +82,18 @@ namespace Slam\Debug\Doctrine
         public static function export($var, $maxDepth)
         {
             $return = null;
-            $isObj  = is_object($var);
+            $isObj  = \is_object($var);
 
             if ($var instanceof Collection) {
                 $var = $var->toArray();
             }
 
-            if ( ! $maxDepth) {
-                return is_object($var) ? get_class($var)
-                    : (is_array($var) ? 'Array(' . count($var) . ')' : $var);
+            if (! $maxDepth) {
+                return \is_object($var) ? \get_class($var)
+                    : (\is_array($var) ? 'Array(' . \count($var) . ')' : $var);
             }
 
-            if (is_array($var)) {
+            if (\is_array($var)) {
                 $return = [];
 
                 foreach ($var as $k => $v) {
@@ -100,13 +103,13 @@ namespace Slam\Debug\Doctrine
                 return $return;
             }
 
-            if ( ! $isObj) {
+            if (! $isObj) {
                 return $var;
             }
 
             $return = new \stdclass();
             if ($var instanceof \DateTimeInterface) {
-                $return->__CLASS__ = get_class($var);
+                $return->__CLASS__ = \get_class($var);
                 $return->date      = $var->format('c');
                 $return->timezone  = $var->getTimezone()->getName();
 
@@ -129,11 +132,11 @@ namespace Slam\Debug\Doctrine
 
         /**
          * Fill the $return variable with class attributes
-         * Based on obj2array function from {@see https://secure.php.net/manual/en/function.get-object-vars.php#47075}
+         * Based on obj2array function from {@see https://secure.php.net/manual/en/function.get-object-vars.php#47075}.
          *
-         * @param object   $var
+         * @param object    $var
          * @param \stdClass $return
-         * @param int      $maxDepth
+         * @param int       $maxDepth
          *
          * @return mixed
          */
@@ -141,14 +144,13 @@ namespace Slam\Debug\Doctrine
         {
             $clone = (array) $var;
 
-            foreach (array_keys($clone) as $key) {
-                $aux  = explode("\0", $key);
-                $name = end($aux);
-                if ($aux[0] === '') {
-                    $name .= ':' . ($aux[1] === '*' ? 'protected' : $aux[1] . ':private');
+            foreach (\array_keys($clone) as $key) {
+                $aux  = \explode("\0", $key);
+                $name = \end($aux);
+                if ('' === $aux[0]) {
+                    $name .= ':' . ('*' === $aux[1] ? 'protected' : $aux[1] . ':private');
                 }
-                $return->$name = self::export($clone[$key], $maxDepth - 1);
-                ;
+                $return->{$name} = self::export($clone[$key], $maxDepth - 1);
             }
 
             return $return;
@@ -163,7 +165,7 @@ namespace Slam\Debug\Doctrine
          */
         public static function toString($obj)
         {
-            return method_exists($obj, '__toString') ? (string) $obj : get_class($obj) . '@' . spl_object_hash($obj);
+            return \method_exists($obj, '__toString') ? (string) $obj : \get_class($obj) . '@' . \spl_object_hash($obj);
         }
     }
 }

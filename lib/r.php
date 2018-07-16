@@ -43,7 +43,7 @@ namespace Slam\Debug
 
         public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
         {
-            if (null === $var or \is_scalar($var)) {
+            if (null === $var || \is_scalar($var)) {
                 \ob_start();
                 \var_dump($var);
                 $output = \trim(\ob_get_clean());
@@ -107,14 +107,15 @@ namespace Slam\Debug\Doctrine
     /**
      * Static class containing most used debug methods.
      *
-     * @link   www.doctrine-project.org
+     * @see   www.doctrine-project.org
      * @since  2.0
+     *
      * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
      * @author Jonathan Wage <jonwage@gmail.com>
      * @author Roman Borschel <roman@code-factory.org>
      * @author Giorgio Sironi <piccoloprincipeazzurro@gmail.com>
      *
-     * @deprecated The Debug class is deprecated, please use symfony/var-dumper instead.
+     * @deprecated the Debug class is deprecated, please use symfony/var-dumper instead
      */
     final class Debug
     {
@@ -128,31 +129,31 @@ namespace Slam\Debug\Doctrine
         /**
          * Prints a dump of the public, protected and private properties of $var.
          *
-         * @link https://xdebug.org/
+         * @see https://xdebug.org/
          *
-         * @param mixed   $var       The variable to dump.
-         * @param integer $maxDepth  The maximum nesting level for object properties.
-         * @param boolean $stripTags Whether output should strip HTML tags.
-         * @param boolean $echo      Send the dumped value to the output buffer
+         * @param mixed $var       the variable to dump
+         * @param int   $maxDepth  the maximum nesting level for object properties
+         * @param bool  $stripTags whether output should strip HTML tags
+         * @param bool  $echo      Send the dumped value to the output buffer
          *
          * @return string
          */
         public static function dump($var, $maxDepth = 2, $stripTags = true, $echo = true)
         {
-            if (extension_loaded('xdebug')) {
-                ini_set('xdebug.var_display_max_depth', $maxDepth);
+            if (\extension_loaded('xdebug')) {
+                \ini_set('xdebug.var_display_max_depth', $maxDepth);
             }
 
             $var = self::export($var, $maxDepth);
 
-            ob_start();
-            var_dump($var);
+            \ob_start();
+            \var_dump($var);
 
-            $dump = ob_get_contents();
+            $dump = \ob_get_contents();
 
-            ob_end_clean();
+            \ob_end_clean();
 
-            $dumpText = ($stripTags ? strip_tags(html_entity_decode($dump)) : $dump);
+            $dumpText = ($stripTags ? \strip_tags(\html_entity_decode($dump)) : $dump);
 
             if ($echo) {
                 echo $dumpText;
@@ -170,18 +171,18 @@ namespace Slam\Debug\Doctrine
         public static function export($var, $maxDepth)
         {
             $return = null;
-            $isObj  = is_object($var);
+            $isObj  = \is_object($var);
 
             if ($var instanceof Collection) {
                 $var = $var->toArray();
             }
 
-            if ( ! $maxDepth) {
-                return is_object($var) ? get_class($var)
-                    : (is_array($var) ? 'Array(' . count($var) . ')' : $var);
+            if (! $maxDepth) {
+                return \is_object($var) ? \get_class($var)
+                    : (\is_array($var) ? 'Array(' . \count($var) . ')' : $var);
             }
 
-            if (is_array($var)) {
+            if (\is_array($var)) {
                 $return = [];
 
                 foreach ($var as $k => $v) {
@@ -191,13 +192,13 @@ namespace Slam\Debug\Doctrine
                 return $return;
             }
 
-            if ( ! $isObj) {
+            if (! $isObj) {
                 return $var;
             }
 
             $return = new \stdclass();
             if ($var instanceof \DateTimeInterface) {
-                $return->__CLASS__ = get_class($var);
+                $return->__CLASS__ = \get_class($var);
                 $return->date      = $var->format('c');
                 $return->timezone  = $var->getTimezone()->getName();
 
@@ -220,11 +221,11 @@ namespace Slam\Debug\Doctrine
 
         /**
          * Fill the $return variable with class attributes
-         * Based on obj2array function from {@see https://secure.php.net/manual/en/function.get-object-vars.php#47075}
+         * Based on obj2array function from {@see https://secure.php.net/manual/en/function.get-object-vars.php#47075}.
          *
-         * @param object   $var
+         * @param object    $var
          * @param \stdClass $return
-         * @param int      $maxDepth
+         * @param int       $maxDepth
          *
          * @return mixed
          */
@@ -232,13 +233,13 @@ namespace Slam\Debug\Doctrine
         {
             $clone = (array) $var;
 
-            foreach (array_keys($clone) as $key) {
-                $aux  = explode("\0", (string) $key);
-                $name = end($aux);
-                if ($aux[0] === '') {
-                    $name .= ':' . ($aux[1] === '*' ? 'protected' : $aux[1] . ':private');
+            foreach (\array_keys($clone) as $key) {
+                $aux  = \explode("\0", (string) $key);
+                $name = \end($aux);
+                if ('' === $aux[0]) {
+                    $name .= ':' . ('*' === $aux[1] ? 'protected' : $aux[1] . ':private');
                 }
-                $return->$name = self::export($clone[$key], $maxDepth - 1);
+                $return->{$name} = self::export($clone[$key], $maxDepth - 1);
             }
 
             return $return;
@@ -253,11 +254,11 @@ namespace Slam\Debug\Doctrine
          */
         private static function getRealClass($class)
         {
-            if (! class_exists(Proxy::class) || false === ($pos = strrpos($class, '\\' . Proxy::MARKER . '\\'))) {
+            if (! \class_exists(Proxy::class) || false === ($pos = \strrpos($class, '\\' . Proxy::MARKER . '\\'))) {
                 return $class;
             }
 
-            return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
+            return \substr($class, $pos + Proxy::MARKER_LENGTH + 2);
         }
 
         /**
@@ -269,7 +270,7 @@ namespace Slam\Debug\Doctrine
          */
         private static function getClass($object)
         {
-            return self::getRealClass(get_class($object));
+            return self::getRealClass(\get_class($object));
         }
     }
 }

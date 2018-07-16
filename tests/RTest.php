@@ -34,40 +34,40 @@ final class RTest extends TestCase
     {
         r(1, false);
 
-        $this->assertContains(__FILE__, MockStderr::$output);
-        $this->assertContains('int(1)', MockStderr::$output);
+        static::assertContains(__FILE__, MockStderr::$output);
+        static::assertContains('int(1)', MockStderr::$output);
     }
 
     public function testNonScalar()
     {
         r([1 => 2], false);
 
-        $this->assertContains(__FILE__, MockStderr::$output);
-        $this->assertContains("Array\n(\n    [1] => 2\n)", MockStderr::$output);
+        static::assertContains(__FILE__, MockStderr::$output);
+        static::assertContains("Array\n(\n    [1] => 2\n)", MockStderr::$output);
     }
 
     public function testFullstackOutput()
     {
         r(1, false, 0, true);
 
-        $this->assertContains(__FILE__, MockStderr::$output);
-        $this->assertContains(__FUNCTION__, MockStderr::$output);
-        $this->assertContains('TestCase', MockStderr::$output);
+        static::assertContains(__FILE__, MockStderr::$output);
+        static::assertContains(__FUNCTION__, MockStderr::$output);
+        static::assertContains('TestCase', MockStderr::$output);
     }
 
     public function testQueryDebug()
     {
         rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', ['p1' => 1, 'p11' => 2, 'p2' => '"'], false, 0, true);
 
-        $this->assertContains('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', MockStderr::$output);
+        static::assertContains('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', MockStderr::$output);
     }
 
     public function testDoctrine()
     {
         r(new stdClass(), false, 1);
 
-        $this->assertContains(__FILE__, MockStderr::$output);
-        $this->assertContains('__CLASS__', MockStderr::$output);
+        static::assertContains(__FILE__, MockStderr::$output);
+        static::assertContains('__CLASS__', MockStderr::$output);
     }
 
     public function testClearRootPath()
@@ -76,7 +76,7 @@ final class RTest extends TestCase
 
         r(1, false);
 
-        $this->assertContains(\basename(__FILE__), MockStderr::$output);
-        $this->assertNotContains(__DIR__, MockStderr::$output);
+        static::assertContains(\basename(__FILE__), MockStderr::$output);
+        static::assertNotContains(__DIR__, MockStderr::$output);
     }
 }
