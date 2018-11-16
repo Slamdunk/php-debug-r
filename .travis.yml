@@ -6,6 +6,7 @@ matrix:
   fast_finish: true
   include:
     - php: 5.3
+      dist: precise
       env: CODE_COVERAGE=1
 
 cache:
