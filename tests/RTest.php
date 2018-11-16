@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SlamTest\Debug;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_TestCase;
 use stdClass;
 
-final class RTest extends TestCase
+final class RTest extends PHPUnit_Framework_TestCase
 {
     const STREAM_FILTER_NAME = 'STDERR_MOCK';
 
@@ -18,7 +16,7 @@ final class RTest extends TestCase
     protected function setUp()
     {
         if (true !== self::$isStreamFilterRegistered) {
-            self::$isStreamFilterRegistered = \stream_filter_register(self::STREAM_FILTER_NAME, MockStderr::class);
+            self::$isStreamFilterRegistered = \stream_filter_register(self::STREAM_FILTER_NAME, 'SlamTest\\Debug\\MockStderr');
         }
 
         MockStderr::$output     = '';
@@ -40,7 +38,7 @@ final class RTest extends TestCase
 
     public function testNonScalar()
     {
-        r([1 => 2], false);
+        r(array(1 => 2), false);
 
         static::assertContains(__FILE__, MockStderr::$output);
         static::assertContains("Array\n(\n    [1] => 2\n)", MockStderr::$output);
@@ -57,7 +55,7 @@ final class RTest extends TestCase
 
     public function testQueryDebug()
     {
-        rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', ['p1' => 1, 'p11' => 2, 'p2' => '"'], false, 0, true);
+        rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', array('p1' => 1, 'p11' => 2, 'p2' => '"'), false, 0, true);
 
         static::assertContains('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', MockStderr::$output);
     }

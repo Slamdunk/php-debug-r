@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SlamTest\Debug;
 
 use php_user_filter;

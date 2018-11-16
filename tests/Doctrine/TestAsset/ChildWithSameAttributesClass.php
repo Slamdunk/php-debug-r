@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SlamTest\Debug\Doctrine\TestAsset;
 
 final class ChildWithSameAttributesClass extends ParentClass

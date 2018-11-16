@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SlamTest\Debug\Doctrine;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_TestCase;
 use Slam\Debug\Doctrine\Debug;
 
-final class DebugTest extends TestCase
+final class DebugTest extends PHPUnit_Framework_TestCase
 {
     public function testExportObject()
     {
@@ -22,7 +20,7 @@ final class DebugTest extends TestCase
     public function testExportObjectWithReference()
     {
         $foo = 'bar';
-        $bar = ['foo' => & $foo];
+        $bar = array('foo' => & $foo);
         $baz = (object) $bar;
 
         $var      = Debug::export($baz, 2);
@@ -34,7 +32,7 @@ final class DebugTest extends TestCase
 
     public function testExportArray()
     {
-        $array              = ['a' => 'b', 'b' => ['c', 'd' => ['e', 'f']]];
+        $array              = array('a' => 'b', 'b' => array('c', 'd' => array('e', 'f')));
         $var                = Debug::export($array, 2);
         $expected           = $array;
         $expected['b']['d'] = 'Array(2)';
@@ -47,35 +45,17 @@ final class DebugTest extends TestCase
 
         $var = Debug::export($obj, 2);
         static::assertEquals('DateTime', $var->__CLASS__);
-        static::assertEquals('2010-10-10T10:10:10+00:00', $var->date);
-    }
-
-    public function testExportDateTimeImmutable()
-    {
-        $obj = new \DateTimeImmutable('2010-10-10 10:10:10', new \DateTimeZone('UTC'));
-
-        $var = Debug::export($obj, 2);
-        static::assertEquals('DateTimeImmutable', $var->__CLASS__);
-        static::assertEquals('2010-10-10T10:10:10+00:00', $var->date);
-    }
-
-    public function testExportDateTimeZone()
-    {
-        $obj = new \DateTimeImmutable('2010-10-10 12:34:56', new \DateTimeZone('Europe/Rome'));
-
-        $var = Debug::export($obj, 2);
-        static::assertEquals('DateTimeImmutable', $var->__CLASS__);
-        static::assertEquals('2010-10-10T12:34:56+02:00', $var->date);
+        static::assertEquals('2010-10-10 10:10:10', $var->date);
     }
 
     public function testExportArrayTraversable()
     {
-        $obj = new \ArrayObject(['foobar']);
+        $obj = new \ArrayObject(array('foobar'));
 
         $var = Debug::export($obj, 2);
         static::assertContains('foobar', $var->__STORAGE__);
 
-        $it = new \ArrayIterator(['foobar']);
+        $it = new \ArrayIterator(array('foobar'));
 
         $var = Debug::export($it, 5);
         static::assertContains('foobar', $var->__STORAGE__);
@@ -128,27 +108,27 @@ final class DebugTest extends TestCase
 
     public function provideAttributesCases()
     {
-        return [
-            'different-attributes' => [
+        return array(
+            'different-attributes' => array(
                 new TestAsset\ChildClass(),
-                [
+                array(
                     'childPublicAttribute'                                                         => 4,
                     'childProtectedAttribute:protected'                                            => 5,
                     'childPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ChildClass:private'   => 6,
                     'parentPublicAttribute'                                                        => 1,
                     'parentProtectedAttribute:protected'                                           => 2,
                     'parentPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ParentClass:private' => 3,
-                ],
-            ],
-            'same-attributes' => [
+                ),
+            ),
+            'same-attributes' => array(
                 new TestAsset\ChildWithSameAttributesClass(),
-                [
+                array(
                     'parentPublicAttribute'                                                                         => 4,
                     'parentProtectedAttribute:protected'                                                            => 5,
                     'parentPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ChildWithSameAttributesClass:private' => 6,
                     'parentPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ParentClass:private'                  => 3,
-                ],
-            ],
-        ];
+                ),
+            ),
+        );
     }
 }

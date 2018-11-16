@@ -1,21 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
 namespace
 {
     use Slam\Debug\R as DebugR;
 
-    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
+    function r($var, $exit = true, $level = 0, $fullstack = false)
     {
         DebugR::$db = \debug_backtrace();
         DebugR::debug($var, $exit, $level, $fullstack);
     }
 
-    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false): void
+    function rq($query, array $params, $exit = true, $level = 0, $fullstack = false)
     {
-        \uksort($params, function (string $key1, string $key2) {
-            return \strlen($key2) <=> \strlen($key1);
+        \uksort($params, function ($key1, $key2) {
+            return strcmp(\strlen($key2), \strlen($key1));
         });
 
         foreach ($params as $key => $value) {
@@ -35,13 +33,13 @@ namespace Slam\Debug
 {
     final class R
     {
-        public static $db = [];
+        public static $db = array();
 
         private function __construct()
         {
         }
 
-        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
+        public static function debug($var, $exit = true, $level = 0, $fullstack = false)
         {
             if (null === $var || \is_scalar($var)) {
                 \ob_start();
@@ -64,7 +62,7 @@ namespace Slam\Debug
             }
         }
 
-        private static function formatDb(bool $fullstack): string
+        private static function formatDb($fullstack)
         {
             $output = '';
 
@@ -75,7 +73,7 @@ namespace Slam\Debug
 
                 $output .= (isset($point['class']) ? $point['class'] . '->' : '') . $point['function'];
 
-                $args = [];
+                $args = array();
                 foreach ($point['args'] as $argument) {
                     $args[] = (\is_object($argument)
                         ? \get_class($argument)
@@ -102,7 +100,6 @@ namespace Slam\Debug
 namespace Slam\Debug\Doctrine
 {
     use Doctrine\Common\Collections\Collection;
-    use Doctrine\Common\Persistence\Proxy;
 
     /**
      * Static class containing most used debug methods.
@@ -173,17 +170,13 @@ namespace Slam\Debug\Doctrine
             $return = null;
             $isObj  = \is_object($var);
 
-            if ($var instanceof Collection) {
-                $var = $var->toArray();
-            }
-
             if (! $maxDepth) {
                 return \is_object($var) ? \get_class($var)
                     : (\is_array($var) ? 'Array(' . \count($var) . ')' : $var);
             }
 
             if (\is_array($var)) {
-                $return = [];
+                $return = array();
 
                 foreach ($var as $k => $v) {
                     $return[$k] = self::export($v, $maxDepth - 1);
@@ -206,11 +199,6 @@ namespace Slam\Debug\Doctrine
             }
 
             $return->__CLASS__ = self::getClass($var);
-
-            if ($var instanceof Proxy) {
-                $return->__IS_PROXY__          = true;
-                $return->__PROXY_INITIALIZED__ = $var->__isInitialized();
-            }
 
             if ($var instanceof \ArrayObject || $var instanceof \ArrayIterator) {
                 $return->__STORAGE__ = self::export($var->getArrayCopy(), $maxDepth - 1);
@@ -246,22 +234,6 @@ namespace Slam\Debug\Doctrine
         }
 
         /**
-         * Gets the real class name of a class name that could be a proxy.
-         *
-         * @param string $class
-         *
-         * @return string
-         */
-        private static function getRealClass($class)
-        {
-            if (! \class_exists(Proxy::class) || false === ($pos = \strrpos($class, '\\' . Proxy::MARKER . '\\'))) {
-                return $class;
-            }
-
-            return \substr($class, $pos + Proxy::MARKER_LENGTH + 2);
-        }
-
-        /**
          * Gets the real class name of an object (even if its a proxy).
          *
          * @param object $object
@@ -270,7 +242,7 @@ namespace Slam\Debug\Doctrine
          */
         private static function getClass($object)
         {
-            return self::getRealClass(\get_class($object));
+            return \get_class($object);
         }
     }
 }
