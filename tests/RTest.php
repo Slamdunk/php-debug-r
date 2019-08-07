@@ -11,8 +11,14 @@ final class RTest extends TestCase
 {
     public const STREAM_FILTER_NAME = 'STDERR_MOCK';
 
+    /**
+     * @var bool
+     */
     private static $isStreamFilterRegistered;
 
+    /**
+     * @var resource
+     */
     private $registeredFilter;
 
     protected function setUp(): void
@@ -30,7 +36,7 @@ final class RTest extends TestCase
         \stream_filter_remove($this->registeredFilter);
     }
 
-    public function testScalar()
+    public function testScalar(): void
     {
         r(1, false);
 
@@ -38,7 +44,7 @@ final class RTest extends TestCase
         static::assertStringContainsString('int(1)', MockStderr::$output);
     }
 
-    public function testNonScalar()
+    public function testNonScalar(): void
     {
         r([1 => 2], false);
 
@@ -46,7 +52,7 @@ final class RTest extends TestCase
         static::assertStringContainsString("Array\n(\n    [1] => 2\n)", MockStderr::$output);
     }
 
-    public function testFullstackOutput()
+    public function testFullstackOutput(): void
     {
         r(1, false, 0, true);
 
@@ -55,14 +61,14 @@ final class RTest extends TestCase
         static::assertStringContainsString('TestCase', MockStderr::$output);
     }
 
-    public function testQueryDebug()
+    public function testQueryDebug(): void
     {
         rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', ['p1' => 1, 'p11' => 2, 'p2' => '"'], false, 0, true);
 
         static::assertStringContainsString('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', MockStderr::$output);
     }
 
-    public function testDoctrine()
+    public function testDoctrine(): void
     {
         r(new stdClass(), false, 1);
 
@@ -70,7 +76,7 @@ final class RTest extends TestCase
         static::assertStringContainsString('__CLASS__', MockStderr::$output);
     }
 
-    public function testClearRootPath()
+    public function testClearRootPath(): void
     {
         \define('ROOT_PATH', __DIR__);
 
@@ -78,5 +84,29 @@ final class RTest extends TestCase
 
         static::assertStringContainsString(\basename(__FILE__), MockStderr::$output);
         static::assertStringNotContainsString(__DIR__, MockStderr::$output);
+    }
+
+    /**
+     * @dataProvider provideCallArgumentDetails
+     */
+    public function testCallArgumentDetails($argument, string $expectedNeedle): void
+    {
+        r($argument, false);
+
+        static::assertStringContainsString($expectedNeedle, MockStderr::$output);
+    }
+
+    public function provideCallArgumentDetails(): array
+    {
+        return [
+            [new stdClass(), 'r(stdClass,'],
+            [[1, 2], 'r(array:2,'],
+            [3, 'r(integer:3,'],
+            ['4', 'r(string:4,'],
+            [5.1, 'r(double:5.1,'],
+            [null, 'r(NULL,'],
+            [true, 'r(boolean:true,'],
+            [\str_repeat('foobar ', 10), 'r(string:70:foobar foobar foobar [...],'],
+        ];
     }
 }

@@ -76,11 +76,26 @@ namespace Slam\Debug
                 $output .= (isset($point['class']) ? $point['class'] . '->' : '') . $point['function'];
 
                 $args = [];
-                foreach ($point['args'] as $argument) {
-                    $args[] = (\is_object($argument)
-                        ? \get_class($argument)
-                        : \gettype($argument)
-                    );
+                foreach ($point['args'] as $originalArgument) {
+                    if (\is_object($originalArgument)) {
+                        $argument = \get_class($originalArgument);
+                    } else {
+                        $argument = \gettype($originalArgument);
+                        if (\is_array($originalArgument)) {
+                            $argument .= ':' . \count($originalArgument);
+                        } elseif (\is_bool($originalArgument)) {
+                            $argument .= ':' . ($originalArgument ? 'true' : 'false');
+                        } elseif (\is_string($originalArgument)) {
+                            $argument .= ':' . (isset($originalArgument[21])
+                                ? \strlen($originalArgument) . ':' . \substr($originalArgument, 0, 21) . '[...]'
+                                : $originalArgument
+                            );
+                        } elseif (\is_scalar($originalArgument)) {
+                            $argument .= ':' . $originalArgument;
+                        }
+                    }
+
+                    $args[] = $argument;
                 }
 
                 $output .= '(' . \implode(', ', $args) . ')' . \PHP_EOL;
@@ -108,14 +123,6 @@ namespace Slam\Debug\Doctrine
      * Static class containing most used debug methods.
      *
      * @see   www.doctrine-project.org
-     * @since  2.0
-     *
-     * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
-     * @author Jonathan Wage <jonwage@gmail.com>
-     * @author Roman Borschel <roman@code-factory.org>
-     * @author Giorgio Sironi <piccoloprincipeazzurro@gmail.com>
-     *
-     * @deprecated the Debug class is deprecated, please use symfony/var-dumper instead
      */
     final class Debug
     {
