@@ -6,13 +6,13 @@ namespace
 {
     use Slam\Debug\R as DebugR;
 
-    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
+    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false, string $stripFromFullstack = null): void
     {
         DebugR::$db = \debug_backtrace();
-        DebugR::debug($var, $exit, $level, $fullstack);
+        DebugR::debug($var, $exit, $level, $fullstack, $stripFromFullstack);
     }
 
-    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false): void
+    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false, string $stripFromFullstack = null): void
     {
         \uksort($params, function (string $key1, string $key2) {
             return \strlen($key2) <=> \strlen($key1);
@@ -27,7 +27,7 @@ namespace
         }
 
         DebugR::$db = \debug_backtrace();
-        DebugR::debug($query, $exit, $level, $fullstack);
+        DebugR::debug($query, $exit, $level, $fullstack, $stripFromFullstack);
     }
 }
 
@@ -35,18 +35,21 @@ namespace Slam\Debug
 {
     final class R
     {
+        /**
+         * @var array
+         */
         public static $db = [];
 
         private function __construct()
         {
         }
 
-        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false): void
+        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false, string $stripFromFullstack = null): void
         {
             if (null === $var || \is_scalar($var)) {
                 \ob_start();
                 \var_dump($var);
-                $output = \trim(\ob_get_clean());
+                $output = \trim((string) \ob_get_clean());
             } elseif ($level > 0) {
                 $output = \print_r(Doctrine\Debug::export($var, $level), true);
             } else {
@@ -54,9 +57,9 @@ namespace Slam\Debug
             }
 
             if (\PHP_SAPI === 'cli') {
-                \fwrite(\STDERR, \PHP_EOL . self::formatDb($fullstack) . $output . \PHP_EOL);
+                \fwrite(\STDERR, \PHP_EOL . self::formatDb($fullstack, $stripFromFullstack) . $output . \PHP_EOL);
             } else {
-                echo '<pre><strong>' . self::formatDb($fullstack) . '</strong><br />' . \htmlspecialchars($output) . '</pre>';
+                echo '<pre><strong>' . self::formatDb($fullstack, $stripFromFullstack) . '</strong><br />' . \htmlspecialchars($output) . '</pre>';
             }
 
             if ($exit) {
@@ -64,13 +67,16 @@ namespace Slam\Debug
             }
         }
 
-        private static function formatDb(bool $fullstack): string
+        private static function formatDb(bool $fullstack, string $stripFromFullstack = null): string
         {
             $output = '';
 
             foreach (self::$db as $point) {
                 if (isset($point['file'])) {
-                    $output .= $point['file'] . '(' . $point['line'] . '): ';
+                    if (null !== $stripFromFullstack && false !== \strpos($point['file'], $stripFromFullstack)) {
+                        continue;
+                    }
+                    $output .= $point['file'] . ':' . $point['line'] . ' > ';
                 }
 
                 $output .= (isset($point['class']) ? $point['class'] . '->' : '') . $point['function'];
@@ -145,7 +151,7 @@ namespace Slam\Debug\Doctrine
          *
          * @return string
          */
-        public static function dump($var, $maxDepth = 2, $stripTags = true, $echo = true)
+        public static function dump($var, int $maxDepth = 2, bool $stripTags = true, bool $echo = true)
         {
             if (\extension_loaded('xdebug')) {
                 \ini_set('xdebug.var_display_max_depth', (string) $maxDepth);
@@ -156,7 +162,7 @@ namespace Slam\Debug\Doctrine
             \ob_start();
             \var_dump($var);
 
-            $dump = \ob_get_contents();
+            $dump = (string) \ob_get_contents();
 
             \ob_end_clean();
 
@@ -171,11 +177,10 @@ namespace Slam\Debug\Doctrine
 
         /**
          * @param mixed $var
-         * @param int   $maxDepth
          *
          * @return mixed
          */
-        public static function export($var, $maxDepth)
+        public static function export($var, int $maxDepth)
         {
             $return = null;
             $isObj  = \is_object($var);
@@ -203,7 +208,7 @@ namespace Slam\Debug\Doctrine
                 return $var;
             }
 
-            $return = new \stdclass();
+            $return = new \stdClass();
             if ($var instanceof \DateTimeInterface) {
                 $return->__CLASS__ = \get_class($var);
                 $return->date      = $var->format('c');
@@ -230,13 +235,9 @@ namespace Slam\Debug\Doctrine
          * Fill the $return variable with class attributes
          * Based on obj2array function from {@see https://secure.php.net/manual/en/function.get-object-vars.php#47075}.
          *
-         * @param object    $var
-         * @param \stdClass $return
-         * @param int       $maxDepth
-         *
          * @return mixed
          */
-        private static function fillReturnWithClassAttributes($var, \stdClass $return, $maxDepth)
+        private static function fillReturnWithClassAttributes(object $var, \stdClass $return, int $maxDepth)
         {
             $clone = (array) $var;
 
@@ -254,28 +255,20 @@ namespace Slam\Debug\Doctrine
 
         /**
          * Gets the real class name of a class name that could be a proxy.
-         *
-         * @param string $class
-         *
-         * @return string
          */
-        private static function getRealClass($class)
+        private static function getRealClass(string $class): string
         {
             if (! \class_exists(Proxy::class) || false === ($pos = \strrpos($class, '\\' . Proxy::MARKER . '\\'))) {
                 return $class;
             }
 
-            return \substr($class, $pos + Proxy::MARKER_LENGTH + 2);
+            return \substr($class, (int) ($pos + Proxy::MARKER_LENGTH + 2));
         }
 
         /**
          * Gets the real class name of an object (even if its a proxy).
-         *
-         * @param object $object
-         *
-         * @return string
          */
-        private static function getClass($object)
+        private static function getClass(object $object): string
         {
             return self::getRealClass(\get_class($object));
         }

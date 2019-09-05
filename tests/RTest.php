@@ -9,7 +9,7 @@ use stdClass;
 
 final class RTest extends TestCase
 {
-    public const STREAM_FILTER_NAME = 'STDERR_MOCK';
+    private const STREAM_FILTER_NAME = 'STDERR_MOCK';
 
     /**
      * @var bool
@@ -59,6 +59,18 @@ final class RTest extends TestCase
         static::assertStringContainsString(__FILE__, MockStderr::$output);
         static::assertStringContainsString(__FUNCTION__, MockStderr::$output);
         static::assertStringContainsString('TestCase', MockStderr::$output);
+        static::assertRegExp(\sprintf('/%s:\d+\b/', \preg_quote(__FILE__, '/')), MockStderr::$output);
+        static::assertStringContainsString('TextUI/Command', MockStderr::$output);
+    }
+
+    public function testStripEntriesFromFullstack(): void
+    {
+        r(1, false, 0, true, 'TextUI');
+
+        static::assertStringContainsString(__FILE__, MockStderr::$output);
+        static::assertStringContainsString(__FUNCTION__, MockStderr::$output);
+        static::assertStringContainsString('TestCase', MockStderr::$output);
+        static::assertStringNotContainsString('TextUI/Command', MockStderr::$output);
     }
 
     public function testQueryDebug(): void
