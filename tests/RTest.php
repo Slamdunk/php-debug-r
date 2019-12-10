@@ -40,52 +40,52 @@ final class RTest extends TestCase
     {
         r(1, false);
 
-        static::assertStringContainsString(__FILE__, MockStderr::$output);
-        static::assertStringContainsString('int(1)', MockStderr::$output);
+        self::assertStringContainsString(__FILE__, MockStderr::$output);
+        self::assertStringContainsString('int(1)', MockStderr::$output);
     }
 
     public function testNonScalar(): void
     {
         r([1 => 2], false);
 
-        static::assertStringContainsString(__FILE__, MockStderr::$output);
-        static::assertStringContainsString("Array\n(\n    [1] => 2\n)", MockStderr::$output);
+        self::assertStringContainsString(__FILE__, MockStderr::$output);
+        self::assertStringContainsString("Array\n(\n    [1] => 2\n)", MockStderr::$output);
     }
 
     public function testFullstackOutput(): void
     {
         r(1, false, 0, true);
 
-        static::assertStringContainsString(__FILE__, MockStderr::$output);
-        static::assertStringContainsString(__FUNCTION__, MockStderr::$output);
-        static::assertStringContainsString('TestCase', MockStderr::$output);
-        static::assertRegExp(\sprintf('/%s:\d+\b/', \preg_quote(__FILE__, '/')), MockStderr::$output);
-        static::assertStringContainsString('TextUI/Command', MockStderr::$output);
+        self::assertStringContainsString(__FILE__, MockStderr::$output);
+        self::assertStringContainsString(__FUNCTION__, MockStderr::$output);
+        self::assertStringContainsString('TestCase', MockStderr::$output);
+        self::assertRegExp(\sprintf('/%s:\d+\b/', \preg_quote(__FILE__, '/')), MockStderr::$output);
+        self::assertStringContainsString('TextUI/Command', MockStderr::$output);
     }
 
     public function testStripEntriesFromFullstack(): void
     {
         r(1, false, 0, true, 'TextUI');
 
-        static::assertStringContainsString(__FILE__, MockStderr::$output);
-        static::assertStringContainsString(__FUNCTION__, MockStderr::$output);
-        static::assertStringContainsString('TestCase', MockStderr::$output);
-        static::assertStringNotContainsString('TextUI/Command', MockStderr::$output);
+        self::assertStringContainsString(__FILE__, MockStderr::$output);
+        self::assertStringContainsString(__FUNCTION__, MockStderr::$output);
+        self::assertStringContainsString('TestCase', MockStderr::$output);
+        self::assertStringNotContainsString('TextUI/Command', MockStderr::$output);
     }
 
     public function testQueryDebug(): void
     {
         rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', ['p1' => 1, 'p11' => 2, 'p2' => '"'], false, 0, true);
 
-        static::assertStringContainsString('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', MockStderr::$output);
+        self::assertStringContainsString('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', MockStderr::$output);
     }
 
     public function testDoctrine(): void
     {
         r(new stdClass(), false, 1);
 
-        static::assertStringContainsString(__FILE__, MockStderr::$output);
-        static::assertStringContainsString('__CLASS__', MockStderr::$output);
+        self::assertStringContainsString(__FILE__, MockStderr::$output);
+        self::assertStringContainsString('__CLASS__', MockStderr::$output);
     }
 
     public function testClearRootPath(): void
@@ -94,8 +94,8 @@ final class RTest extends TestCase
 
         r(1, false);
 
-        static::assertStringContainsString(\basename(__FILE__), MockStderr::$output);
-        static::assertStringNotContainsString(__DIR__, MockStderr::$output);
+        self::assertStringContainsString(\basename(__FILE__), MockStderr::$output);
+        self::assertStringNotContainsString(__DIR__, MockStderr::$output);
     }
 
     /**
@@ -105,7 +105,7 @@ final class RTest extends TestCase
     {
         r($argument, false);
 
-        static::assertStringContainsString($expectedNeedle, MockStderr::$output);
+        self::assertStringContainsString($expectedNeedle, MockStderr::$output);
     }
 
     public function provideCallArgumentDetails(): array

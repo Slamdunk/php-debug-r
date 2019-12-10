@@ -6,8 +6,9 @@ matrix:
   fast_finish: true
   include:
     - php: 7.3
-      env: CS_CHECK=1 CODE_COVERAGE=1
-    - php: 7.4snapshot
+      env: CS_CHECK=1
+    - php: 7.4
+      env: CODE_COVERAGE=1
 
 cache:
   directories:

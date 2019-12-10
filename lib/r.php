@@ -6,13 +6,13 @@ namespace
 {
     use Slam\Debug\R as DebugR;
 
-    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false, string $stripFromFullstack = null): void
+    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false, ?string $stripFromFullstack = null): void
     {
         DebugR::$db = \debug_backtrace();
         DebugR::debug($var, $exit, $level, $fullstack, $stripFromFullstack);
     }
 
-    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false, string $stripFromFullstack = null): void
+    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false, ?string $stripFromFullstack = null): void
     {
         \uksort($params, function (string $key1, string $key2) {
             return \strlen($key2) <=> \strlen($key1);
@@ -44,7 +44,7 @@ namespace Slam\Debug
         {
         }
 
-        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false, string $stripFromFullstack = null): void
+        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false, ?string $stripFromFullstack = null): void
         {
             if (null === $var || \is_scalar($var)) {
                 \ob_start();
@@ -67,7 +67,7 @@ namespace Slam\Debug
             }
         }
 
-        private static function formatDb(bool $fullstack, string $stripFromFullstack = null): string
+        private static function formatDb(bool $fullstack, ?string $stripFromFullstack = null): string
         {
             $output = '';
 
