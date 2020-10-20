@@ -8,7 +8,7 @@ use php_user_filter;
 
 final class MockStderr extends php_user_filter
 {
-    public static $output = '';
+    public static string $output = '';
 
     public function filter($in, $out, & $consumed, $closing)
     {

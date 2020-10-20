@@ -35,10 +35,7 @@ namespace Slam\Debug
 {
     final class R
     {
-        /**
-         * @var array
-         */
-        public static $db = [];
+        public static array $db = [];
 
         private function __construct()
         {
