@@ -21,7 +21,7 @@ namespace
         foreach ($params as $key => $value) {
             $query = \str_replace(
                 \sprintf(':%s', $key),
-                \sprintf('"%s"', \str_replace('"', '\\"', $value)),
+                \sprintf('"%s"', \str_replace('"', '\\"', (string) $value)),
                 $query
             );
         }
