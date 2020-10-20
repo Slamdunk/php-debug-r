@@ -6,7 +6,7 @@ namespace SlamTest\Debug\Doctrine\TestAsset;
 
 abstract class ParentClass
 {
-    public $parentPublicAttribute       = 1;
-    protected $parentProtectedAttribute = 2;
-    private $parentPrivateAttribute     = 3;
+    public int $parentPublicAttribute       = 1;
+    protected int $parentProtectedAttribute = 2;
+    private int $parentPrivateAttribute     = 3;
 }

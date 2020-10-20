@@ -11,10 +11,7 @@ final class RTest extends TestCase
 {
     private const STREAM_FILTER_NAME = 'STDERR_MOCK';
 
-    /**
-     * @var bool
-     */
-    private static $isStreamFilterRegistered;
+    private static bool $isStreamFilterRegistered = false;
 
     /**
      * @var resource
@@ -59,7 +56,7 @@ final class RTest extends TestCase
         self::assertStringContainsString(__FILE__, MockStderr::$output);
         self::assertStringContainsString(__FUNCTION__, MockStderr::$output);
         self::assertStringContainsString('TestCase', MockStderr::$output);
-        self::assertRegExp(\sprintf('/%s:\d+\b/', \preg_quote(__FILE__, '/')), MockStderr::$output);
+        self::assertMatchesRegularExpression(\sprintf('/%s:\d+\b/', \preg_quote(__FILE__, '/')), MockStderr::$output);
         self::assertStringContainsString('TextUI/Command', MockStderr::$output);
     }
 

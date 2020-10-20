@@ -6,7 +6,7 @@ namespace SlamTest\Debug\Doctrine\TestAsset;
 
 final class ChildWithSameAttributesClass extends ParentClass
 {
-    public $parentPublicAttribute       = 4;
-    protected $parentProtectedAttribute = 5;
-    private $parentPrivateAttribute     = 6;
+    public int $parentPublicAttribute       = 4;
+    protected int $parentProtectedAttribute = 5;
+    private int $parentPrivateAttribute     = 6;
 }
