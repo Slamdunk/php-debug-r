@@ -89,7 +89,8 @@ namespace Slam\Debug
                         } elseif (\is_bool($originalArgument)) {
                             $argument .= ':' . ($originalArgument ? 'true' : 'false');
                         } elseif (\is_string($originalArgument)) {
-                            $argument .= ':' . (isset($originalArgument[21])
+                            $argument .= ':' . (
+                                isset($originalArgument[21])
                                 ? \strlen($originalArgument) . ':' . \substr($originalArgument, 0, 21) . '[...]'
                                 : $originalArgument
                             );
