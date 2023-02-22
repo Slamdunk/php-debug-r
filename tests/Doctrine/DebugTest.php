@@ -9,6 +9,7 @@ use ArrayObject;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Slam\Debug\Doctrine\Debug;
 use stdClass;
@@ -112,9 +113,7 @@ final class DebugTest extends TestCase
         self::assertNotSame($outputValue, $dump);
     }
 
-    /**
-     * @dataProvider provideAttributesCases
-     */
+    #[DataProvider('provideAttributesCases')]
     public function testExportParentAttributes(TestAsset\ParentClass $class, array $expected): void
     {
         $print_r_class    = \print_r($class, true);
@@ -132,18 +131,18 @@ final class DebugTest extends TestCase
         self::assertSame($expected, $var);
     }
 
-    public function provideAttributesCases()
+    public static function provideAttributesCases()
     {
         return [
             'different-attributes' => [
                 new TestAsset\ChildClass(),
                 [
-                    'childPublicAttribute'                                                         => 4,
-                    'childProtectedAttribute:protected'                                            => 5,
-                    'childPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ChildClass:private'   => 6,
                     'parentPublicAttribute'                                                        => 1,
                     'parentProtectedAttribute:protected'                                           => 2,
                     'parentPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ParentClass:private' => 3,
+                    'childPublicAttribute'                                                         => 4,
+                    'childProtectedAttribute:protected'                                            => 5,
+                    'childPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ChildClass:private'   => 6,
                 ],
             ],
             'same-attributes' => [
@@ -151,8 +150,8 @@ final class DebugTest extends TestCase
                 [
                     'parentPublicAttribute'                                                                         => 4,
                     'parentProtectedAttribute:protected'                                                            => 5,
-                    'parentPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ChildWithSameAttributesClass:private' => 6,
                     'parentPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ParentClass:private'                  => 3,
+                    'parentPrivateAttribute:SlamTest\Debug\Doctrine\TestAsset\ChildWithSameAttributesClass:private' => 6,
                 ],
             ],
         ];

@@ -10,7 +10,7 @@ final class MockStderr extends php_user_filter
 {
     public static string $output = '';
 
-    public function filter($in, $out, & $consumed, $closing)
+    public function filter($in, $out, & $consumed, $closing): int
     {
         while ($bucket = \stream_bucket_make_writeable($in)) {
             self::$output = $bucket->data;
