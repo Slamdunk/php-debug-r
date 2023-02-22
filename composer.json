@@ -1,8 +1,8 @@
 {
     "name": "slam/php-debug-r",
-    "type": "library",
     "description": "Debug function",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Filippo Tessarotto",
