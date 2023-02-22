@@ -2,18 +2,28 @@
 
 declare(strict_types=1);
 
-namespace
-{
+namespace {
     use Slam\Debug\R as DebugR;
 
-    function r($var, bool $exit = true, int $level = 0, bool $fullstack = false, ?string $stripFromFullstack = null): void
-    {
+    function r(
+        mixed $var,
+        bool $exit = true,
+        int $level = 0,
+        bool $fullstack = false,
+        ?string $stripFromFullstack = null
+    ): void {
         DebugR::$db = \debug_backtrace();
         DebugR::debug($var, $exit, $level, $fullstack, $stripFromFullstack);
     }
 
-    function rq(string $query, array $params, bool $exit = true, int $level = 0, bool $fullstack = false, ?string $stripFromFullstack = null): void
-    {
+    function rq(
+        string $query,
+        array $params,
+        bool $exit = true,
+        int $level = 0,
+        bool $fullstack = false,
+        ?string $stripFromFullstack = null
+    ): void {
         \uksort($params, function (string $key1, string $key2) {
             return \strlen($key2) <=> \strlen($key1);
         });
@@ -41,8 +51,13 @@ namespace Slam\Debug
         {
         }
 
-        public static function debug($var, bool $exit = true, int $level = 0, bool $fullstack = false, ?string $stripFromFullstack = null): void
-        {
+        public static function debug(
+            mixed $var,
+            bool $exit = true,
+            int $level = 0,
+            bool $fullstack = false,
+            ?string $stripFromFullstack = null
+        ): void {
             if (null === $var || \is_scalar($var)) {
                 \ob_start();
                 \var_dump($var);
@@ -70,7 +85,7 @@ namespace Slam\Debug
 
             foreach (self::$db as $point) {
                 if (isset($point['file'])) {
-                    if (null !== $stripFromFullstack && false !== \strpos($point['file'], $stripFromFullstack)) {
+                    if (null !== $stripFromFullstack &&   \str_contains($point['file'], $stripFromFullstack)) {
                         continue;
                     }
                     $output .= $point['file'] . ':' . $point['line'] . ' > ';
@@ -81,7 +96,7 @@ namespace Slam\Debug
                 $args = [];
                 foreach ($point['args'] as $originalArgument) {
                     if (\is_object($originalArgument)) {
-                        $argument = \get_class($originalArgument);
+                        $argument = $originalArgument::class;
                     } else {
                         $argument = \gettype($originalArgument);
                         if (\is_array($originalArgument)) {
@@ -131,13 +146,6 @@ namespace Slam\Debug\Doctrine
     final class Debug
     {
         /**
-         * Private constructor (prevents instantiation).
-         */
-        private function __construct()
-        {
-        }
-
-        /**
          * Prints a dump of the public, protected and private properties of $var.
          *
          * @see https://xdebug.org/
@@ -146,10 +154,8 @@ namespace Slam\Debug\Doctrine
          * @param int   $maxDepth  the maximum nesting level for object properties
          * @param bool  $stripTags whether output should strip HTML tags
          * @param bool  $echo      Send the dumped value to the output buffer
-         *
-         * @return string
          */
-        public static function dump($var, int $maxDepth = 2, bool $stripTags = true, bool $echo = true)
+        public static function dump(mixed $var, int $maxDepth = 2, bool $stripTags = true, bool $echo = true): string
         {
             if (\extension_loaded('xdebug')) {
                 \ini_set('xdebug.var_display_max_depth', (string) $maxDepth);
@@ -173,14 +179,8 @@ namespace Slam\Debug\Doctrine
             return $dumpText;
         }
 
-        /**
-         * @param mixed $var
-         *
-         * @return mixed
-         */
-        public static function export($var, int $maxDepth)
+        public static function export(mixed $var, int $maxDepth): null|string|array|int|float|bool|\stdClass
         {
-            $return = null;
             $isObj  = \is_object($var);
 
             if ($var instanceof Collection) {
@@ -188,7 +188,7 @@ namespace Slam\Debug\Doctrine
             }
 
             if (! $maxDepth) {
-                return \is_object($var) ? \get_class($var)
+                return \is_object($var) ? $var::class
                     : (\is_array($var) ? 'Array(' . \count($var) . ')' : $var);
             }
 
@@ -208,7 +208,7 @@ namespace Slam\Debug\Doctrine
 
             $return = new \stdClass();
             if ($var instanceof \DateTimeInterface) {
-                $return->__CLASS__ = \get_class($var);
+                $return->__CLASS__ = $var::class;
                 $return->date      = $var->format('c');
                 $return->timezone  = $var->getTimezone()->getName();
 
@@ -232,10 +232,8 @@ namespace Slam\Debug\Doctrine
         /**
          * Fill the $return variable with class attributes
          * Based on obj2array function from {@see https://secure.php.net/manual/en/function.get-object-vars.php#47075}.
-         *
-         * @return mixed
          */
-        private static function fillReturnWithClassAttributes(object $var, \stdClass $return, int $maxDepth)
+        private static function fillReturnWithClassAttributes(object $var, \stdClass $return, int $maxDepth): \stdClass
         {
             $clone = (array) $var;
 
@@ -268,7 +266,7 @@ namespace Slam\Debug\Doctrine
          */
         private static function getClass(object $object): string
         {
-            return self::getRealClass(\get_class($object));
+            return self::getRealClass($object::class);
         }
     }
 }

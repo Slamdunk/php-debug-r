@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SlamTest\Debug;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -57,7 +58,7 @@ final class RTest extends TestCase
         self::assertStringContainsString(__FUNCTION__, MockStderr::$output);
         self::assertStringContainsString('TestCase', MockStderr::$output);
         self::assertMatchesRegularExpression(\sprintf('/%s:\d+\b/', \preg_quote(__FILE__, '/')), MockStderr::$output);
-        self::assertStringContainsString('TextUI/Command', MockStderr::$output);
+        self::assertStringContainsString('TextUI/Application', MockStderr::$output);
     }
 
     public function testStripEntriesFromFullstack(): void
@@ -95,9 +96,7 @@ final class RTest extends TestCase
         self::assertStringNotContainsString(__DIR__, MockStderr::$output);
     }
 
-    /**
-     * @dataProvider provideCallArgumentDetails
-     */
+    #[DataProvider('provideCallArgumentDetails')]
     public function testCallArgumentDetails($argument, string $expectedNeedle): void
     {
         r($argument, false);
@@ -105,7 +104,7 @@ final class RTest extends TestCase
         self::assertStringContainsString($expectedNeedle, MockStderr::$output);
     }
 
-    public function provideCallArgumentDetails(): array
+    public static function provideCallArgumentDetails(): array
     {
         return [
             [new stdClass(), 'r(stdClass,'],
