@@ -6,9 +6,6 @@
         cacheDirectory=".phpunit.cache"
 >
   <coverage>
-    <include>
-      <directory suffix=".php">./lib</directory>
-    </include>
     <report>
       <text outputFile="php://stdout" showOnlySummary="true"/>
     </report>
@@ -16,4 +13,9 @@
   <testsuite name="Debug_R">
     <directory>./tests</directory>
   </testsuite>
+  <source>
+    <include>
+      <directory>./lib</directory>
+    </include>
+  </source>
 </phpunit>
