@@ -31,7 +31,7 @@ namespace {
         foreach ($params as $key => $value) {
             $query = \str_replace(
                 \sprintf(':%s', $key),
-                \sprintf('"%s"', \str_replace('"', '\\"', (string) $value)),
+                \sprintf('\'%s\'', \str_replace('\'', '\\\'', (string) $value)),
                 $query
             );
         }
@@ -47,9 +47,7 @@ namespace Slam\Debug
     {
         public static array $db = [];
 
-        private function __construct()
-        {
-        }
+        private function __construct() {}
 
         public static function debug(
             mixed $var,
@@ -249,9 +247,7 @@ namespace Slam\Debug\Doctrine
             return $return;
         }
 
-        /**
-         * Gets the real class name of a class name that could be a proxy.
-         */
+        /** Gets the real class name of a class name that could be a proxy. */
         private static function getRealClass(string $class): string
         {
             if (! \class_exists(Proxy::class) || false === ($pos = \strrpos($class, '\\' . Proxy::MARKER . '\\'))) {
@@ -261,9 +257,7 @@ namespace Slam\Debug\Doctrine
             return \substr($class, (int) ($pos + Proxy::MARKER_LENGTH + 2));
         }
 
-        /**
-         * Gets the real class name of an object (even if its a proxy).
-         */
+        /** Gets the real class name of an object (even if its a proxy). */
         private static function getClass(object $object): string
         {
             return self::getRealClass($object::class);

@@ -14,9 +14,7 @@ final class RTest extends TestCase
 
     private static bool $isStreamFilterRegistered = false;
 
-    /**
-     * @var resource
-     */
+    /** @var resource */
     private $registeredFilter;
 
     protected function setUp(): void
@@ -73,9 +71,9 @@ final class RTest extends TestCase
 
     public function testQueryDebug(): void
     {
-        rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', ['p1' => 1, 'p11' => 2, 'p2' => '"'], false, 0, true);
+        rq('SELECT * FROM table WHERE c1 = :p1 AND c1 = :p11 AND c1 = :p2', ['p1' => 1, 'p11' => 2, 'p2' => '\''], false, 0, true);
 
-        self::assertStringContainsString('SELECT * FROM table WHERE c1 = "1" AND c1 = "2" AND c1 = "\\""', MockStderr::$output);
+        self::assertStringContainsString('SELECT * FROM table WHERE c1 = \'1\' AND c1 = \'2\' AND c1 = \'\\\'\'', MockStderr::$output);
     }
 
     public function testDoctrine(): void
