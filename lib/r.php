@@ -177,7 +177,7 @@ namespace Slam\Debug\Doctrine
             return $dumpText;
         }
 
-        public static function export(mixed $var, int $maxDepth): null|string|array|int|float|bool|\stdClass
+        public static function export(mixed $var, int $maxDepth): null|array|bool|float|int|\stdClass|string
         {
             $isObj  = \is_object($var);
 
