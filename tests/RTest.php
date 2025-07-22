@@ -94,7 +94,7 @@ final class RTest extends TestCase
         self::assertStringNotContainsString(__DIR__, MockStderr::$output);
     }
 
-    #[DataProvider('provideCallArgumentDetails')]
+    #[DataProvider('provideCallArgumentDetailsCases')]
     public function testCallArgumentDetails($argument, string $expectedNeedle): void
     {
         r($argument, false);
@@ -102,7 +102,7 @@ final class RTest extends TestCase
         self::assertStringContainsString($expectedNeedle, MockStderr::$output);
     }
 
-    public static function provideCallArgumentDetails(): array
+    public static function provideCallArgumentDetailsCases(): array
     {
         return [
             [new stdClass(), 'r(stdClass,'],
