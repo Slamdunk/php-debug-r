@@ -102,7 +102,7 @@ final class RTest extends TestCase
         self::assertStringContainsString($expectedNeedle, MockStderr::$output);
     }
 
-    public static function provideCallArgumentDetailsCases(): array
+    public static function provideCallArgumentDetailsCases(): iterable
     {
         return [
             [new stdClass(), 'r(stdClass,'],

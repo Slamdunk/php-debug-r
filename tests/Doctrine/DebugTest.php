@@ -131,7 +131,7 @@ final class DebugTest extends TestCase
         self::assertSame($expected, $var);
     }
 
-    public static function provideExportParentAttributesCases()
+    public static function provideExportParentAttributesCases(): iterable
     {
         return [
             'different-attributes' => [
