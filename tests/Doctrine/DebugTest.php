@@ -113,7 +113,7 @@ final class DebugTest extends TestCase
         self::assertNotSame($outputValue, $dump);
     }
 
-    #[DataProvider('provideAttributesCases')]
+    #[DataProvider('provideExportParentAttributesCases')]
     public function testExportParentAttributes(TestAsset\ParentClass $class, array $expected): void
     {
         $print_r_class    = \print_r($class, true);
@@ -131,7 +131,7 @@ final class DebugTest extends TestCase
         self::assertSame($expected, $var);
     }
 
-    public static function provideAttributesCases()
+    public static function provideExportParentAttributesCases(): iterable
     {
         return [
             'different-attributes' => [
