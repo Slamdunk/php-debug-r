@@ -14,7 +14,7 @@
         "php": "~8.3.0 || ~8.4.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^12.3.14",
+        "phpunit/phpunit": "^12.3.15",
         "slam/php-cs-fixer-extensions": "^3.13.0"
     },
     "autoload": {
